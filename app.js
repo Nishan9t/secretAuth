@@ -3,6 +3,8 @@ const express=require("express");
 const bodyParser=require("body-parser");
 const ejs=require("ejs");
 const mongoose=require("mongoose");
+//for encrypt the data in db
+const encrypt=require("mongoose-encryption");
 
 const app=express();
 
@@ -11,11 +13,15 @@ app.set('view engine','ejs');
 app.use(bodyParser.urlencoded({extended:true}));
 
 mongoose.connect("mongodb://localhost:27017/userDB");
-
-const userSchema={
+//we have to make change in userSchema to use mongoose-encryption
+const userSchema=new mongoose.Schema({
   email:String,
   password:String
-};
+});
+
+//for encryption
+const secret="Thisiourlittlesecret.";
+userSchema.plugin(encrypt, { secret: secret ,encryptedFields: ['password']});
 
 const User=new mongoose.model("User",userSchema);
 
